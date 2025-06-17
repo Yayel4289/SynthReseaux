@@ -245,11 +245,61 @@
     - Internet Protocol $\Rightarrow$ IP
         - IP Adress $\Rightarrow$ identifies host device
             - ex : gaia.cs.umass.edu $\Rightarrow$ 128.119.245.12
+        - Fragmentation 
+            - links have a MTU $\Rightarrow$ Maximum Transfer Size
+            - if datagram length > link MTU
+                - datagram Fragmentation 
+                - datagram reassembled at dest
+        - Addressing and Subnetting $\Rightarrow$ TP
+            - Formules 
+                - `net = addr & mask`
+                - `host = addr & !mask`
+                - `(other_addr & mask) == (addr & mask)`
+                - `(other_addr ^ addr) & mask == 0`
+        - Forwarding
+            - Forwarding table
+                - <img src="images/network/forwarding_table.png" height="100"/>
+            - Longest Prefix Matching (LPM) (self exp)
+                - Implementation with b-tree
+                    - bit = 0 $\Rightarrow$ Left
+                    - bit = 1 $\Rightarrow$ Right
+                    - <img src="images/network/lpm.png" height="100"/>
+            - Subnetting $\Rightarrow$ TP
+            
+
+- Router 
+    - Routing algorithms 
+        - Def : determining path taken by pkts from src to dest
+        - 2 types 
+            - Link State Routing Protocol
+                - Link State Packet (LSP) Flooding
+                    - Construction of Link State DataBase (LSDB)
+                - Dijkstra algo (voir slides)
+            - Distance Vector Protocol (voir projet)
+
+- Switching 
+    - Def : defines how a network element forwards data with its header
+    - Needed by Routing
+    - Types of networks
+        - Virtual Circuit (VC) networks
+            - virutal circuits (paths) must be setup before traffic
+            - Pkt forwarding depends on header (VC number)
+            - intelligence in network (dumb end systems)
+            - guaranteed services : debit, latency
+            - Ex : Circuit Switching
+        - Datagram networks
+            - no setup
+            - pkt header contains dest
+            - every router must knpw how to reach dest !
+            - Uses IP
+            - intelligence at edge
+            - best effort service
+
+
     
-- Network Core :
-        - Network Structure
-        - ISP : Internet Service Provider (Fournisseur d'accès internet)
-        - Tier 1,2,3/local $\Rightarrow$ chaque tier paye au-dessus (tier 3 = Proximus, local can be univ, etc)
+- Network Structure
+    - ISP : Internet Service Provider (Fournisseur d'accès internet)
+    - Tier 1,2,3/local $\Rightarrow$ chaque tier paye au-dessus (tier 3 = Proximus, local can be univ, etc)
 
 ### Link
 - Comment transférer data ?
@@ -302,6 +352,11 @@
             - Average number of packets = $\frac{\overline{M}}{K_{max}} + \frac{1}{2}$
             - $\overline{T} = \frac{1}{R} ((N - 1) K_{max} + \overline{M} + H (\frac{\overline{M}}{K_{max}} + \frac{1}{2}))$
             - $K_{max} \approx \sqrt{\overline{M} \frac{H}{N - 1}}$
+
+- Error detection 
+    - Parity bits 
+    - Checksum
+    - Cyclic redundancy checks
 
 ### Physical
 
