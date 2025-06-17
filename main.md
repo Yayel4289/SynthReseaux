@@ -136,44 +136,108 @@
         - let $n_i$ the components of a segment 
         - the segment keeps $CS = \neg \sum n_i \Rightarrow CS + \sum n_i =$ only 1's
         - so can tell if corrupted bit
-
-- Reliable data transfer Principles
     
-
+- Reliable Data Transfer (RDT) Principles
+    - Assumptions
+        - Everything works $\Rightarrow$ RDT1.0
+            - Ideal (not realistic) data transfer 
+        - Bits may flip $\Rightarrow$ RDT2.0
+            - Receiver verify msgs with Checksum and send : 
+                - ACK(nowlegments) $\Rightarrow$ pkt OK
+                - NAK (Negative AcK) $\Rightarrow$ pkt corrupted
+            - <img src="images/transport/rdt20.png" height="100"/>
+        - ACK / NAK may be corrupted $\Rightarrow$ RDT2.1
+            - Alterning sequence number 0, 1 to recognize duplicates (only 2 bc stop & wait)
+            - Checksum on ACK / NAK too
+            - <img src="images/transport/rdt21.png" height="100"/>
+        - NAK-free $\Rightarrow$ RDT2.2
+            - Always ACK the sequence number
+            - <img src="images/transport/rdt22.png" height="100"/>
+        - Pkt loss may happen $\Rightarrow$ RDT3.0
+            - timeout for ACK's
+            - <img src="images/transport/rdt30.png" height="100"/>
+            - base perf stinks $\Rightarrow$ solution :
+                - pipelining : 2 ways 
+                    - Go-Back-N
+                        - sequence number : 0 $\rightarrow$ n
+                        - discard out of order pkts if pkt loss
+                        - <img src="images/transport/go_back_n.png" height="100"/>
+                    - Selective repeat
+                        - $\approx$ Go-Back-n but doesn't discard out of order pkts
+                        - <img src="images/transport/selective_repeat.png" height="100"/>
+            
 - Protocols 
     - Unavailable Services 
         - delay guarantees
         - bandwidth guarantees
     - De/Multiplexing $\Rightarrow$ by header
-    - Transmission Control Protocol $\Rightarrow$ TCP 
-        - \+
-            - connection-oriented $\Rightarrow$ setup required client-server processes
-            - reliable data transfer
-            - flow control $\Rightarrow$ no overwhelming to receiver
-            - congestion control $\Rightarrow$ limit sender if network overload
-        - \- 
-            - no timing
-            - no minimum debit
-            - no security
-            - heavy
+    - Concrete Protocols
+        - Transmission Control Protocol $\Rightarrow$ TCP 
+            - Nagle's algo 
+                - MSS $\Rightarrow$ Maximum Segment Size
+                - algo $\Rightarrow$ fill full segment before sending 
+                    - full segment sent = send window $\Rightarrow$ "sliding window"
+                    - exception with unACK'd segments : push immediately
+            - Constant estimation of RTT for RTO (Retransmission TimeOut)
+            - Reliable data transfer 
+                - Fast retransmit 
+                    - Detect lost segments via duplicates (3) ACKs
+                    - Directly resend
+            - Flow control
+                - Match Edge service speed (no overwhelm to receiver)
+                - How ? receive window `rwnd` var sent by receiver
+                    - if `rwnd = 0` : stop sending
+                    - if `rwnd > 0` : send `rwnd` segment
+                - Silly Window Syndrome 
+                    - Risk of slowing down a lot 
+                    - Ex : `rwnd = 1` and 1 byte to be sent *constantly*
+                    - Solutions 
+                        - Avoid too small `rwnd` (receiver part)
+                        - Avoid sendind too small segments (sender part)
+            - Connection Managment 
+                - 3-way handshake
+                - <img src="images/transport/three_way.png" height="100"/>
+            - Congestion Control
+                - $\neq$ Flow control !
+                - To avoid to overwhelm the network (routers, link, ...)
+                - Ex : bottleneck link
+                - let `cwnd` adapting var for congestion window : how ?
+                    - Slow Start
+                        - Fast Actually $\Rightarrow$ exponential
+                        - `cwnd += 1*MSS` every **ACK**
+                    - Additive Increase, Multiplicative Decrease (AIMD)
+                        - let `ssthresh` slow start threshold(=seuil)
+                            - at beginning : set to large value
+                            - after loss : `ssthresh = cwnd / 2`
+                        - AIMD activates when `cwnd == ssthresh`
+                        - Linear
+                        - `cwnd += 1*MSS` every **RTT**
+                        - `cwnd /= 2` if loss
+                            - detected after 3 dup ACKs $\Rightarrow$ Fast Recovery
+                    - if timeout : `cwnd = 1` and Slow Start
 
-        - Multiplexing : `header = (srcIP, dstIP, srcPort, dstPort)`
-        
-        - mnemo : Tu Communique Précautionneusement
+            - Selective ACK (SACK) : if 1 pkt loss but next ones received $\Rightarrow$ notify
 
-    - User Datagram Protocol $\Rightarrow$ UDP
-        - connectionless $\Rightarrow$ no handshake
-        - uses Checksum
-        - \+ 
-            - fast (ex : no handshake)
-        - \- 
-            - unreliable data transfer
-        - why if tcp exists ? video games, streaming $\Rightarrow$ when time is more important
+            - Fair due to AIMD
 
-        - Multiplexing : `header = (dstIP, dstPort)`
+            - Multiplexing : `header = (srcIP, dstIP, srcPort, dstPort)`
 
-        - mnemo : Ultra Direct Pratique
-        
+            - $\overline{Throughput} = \frac{\overline{W}}{RTT}$ ($\overline{W}$ is avg window size)
+            
+            - mnemo : Tu Communique Précautionneusement
+
+        - User Datagram Protocol $\Rightarrow$ UDP
+            - connectionless $\Rightarrow$ no handshake
+            - uses Checksum
+            - \+ 
+                - fast (ex : no handshake)
+            - \- 
+                - unreliable data transfer
+            - why if tcp exists ? video games, streaming $\Rightarrow$ when time is more important
+
+            - Multiplexing : `header = (dstIP, dstPort)`
+
+            - mnemo : Ultra Direct Pratique
 
 ### Network
 
