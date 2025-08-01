@@ -307,13 +307,14 @@
         - Resources : link bandwidth + switch capacity (not ability)
         - Ressources dédiée / 1 circuit $\Rightarrow$ perf++
         - Multiplexing
-            - Frequency Division Multiplexing (FDM)
-                - <img src="images/intro/fdm.png" height="100"/>
-                - Comment ? Signal porteur $f_c$
-            - Time Division Multiplexing (TDM)
-                - <img src="images/intro/tdm.png" height="100"/>
-                - Comment ? RR-like algo
-            - $R_{new} = \frac{R}{N}$
+            - Share 1 link among N circuits
+                - Frequency Division Multiplexing (FDM)
+                    - <img src="images/intro/fdm.png" height="100"/>
+                    - Comment ? Signal porteur $f_c$
+                - Time Division Multiplexing (TDM)
+                    - <img src="images/intro/tdm.png" height="100"/>
+                    - Comment ? RR-like algo
+                - $R_{new} = \frac{R}{N}$
     - Packet Switching : division data en packets
         - 1 lien / packet
         - delay 
@@ -328,6 +329,22 @@
                 - $t_{proc}$ (processing delay, often negligible)
                 - $t_{queue}$ (queuing delay)
                 - $t_{nodal} = t_{trans} + t_{propa} + t_{proc} + t_{queue}$
+        - debit : $R \leq min(R_i) \Rightarrow$ bottleneck 
+        - store and forward $\Rightarrow$ long transmission delay
+            - solution : pipelining 
+                - <img src="images/intro/pipelining.png" height="100"/>
+                - $t_{trans} = (\sum \frac{L}{R_i}) + (N - 1) \frac{L}{R_{min}}$
+                - packet max size
+                    - msg size = $M$ bits
+                    - header size = $H$ bits
+                    - max packet size = $K_{max}$ bits
+                    - Number of bits to transmit = $M + H \lceil \frac{M}{K_{max}} \rceil$
+                    - Time $T$ 
+                        - without pipelining : $T = N (\frac{H + M}{R})$
+                        - with pipelining : $T = \frac{1}{R} ((N - 1) K_{max} + M + H \lceil \frac{M}{K_{max}} \rceil)$ où N is nbr of links
+                    - Average number of packets = $\frac{\overline{M}}{K_{max}} + \frac{1}{2}$
+                    - $\overline{T} = \frac{1}{R} ((N - 1) K_{max} + \overline{M} + H (\frac{\overline{M}}{K_{max}} + \frac{1}{2}))$
+                    - $K_{max} \approx \sqrt{\overline{M} \frac{H}{N - 1}}$
         - queueing
             - M/M/1 queueing model (theorical)
                 - M/M/1 $\Rightarrow$ Markovian x 2, 1 infinite q
@@ -337,21 +354,6 @@
                 - $\overline{N} = \rho (1 - \rho)$ avg nbr of pkts in q
             - delay depends on pkt arrival $\Rightarrow$ exos
             - packet loss (q has finite capacity)
-        - debit : $R \leq min(R_i) \Rightarrow$ bottleneck 
-        - store and forward $\Rightarrow$ long transmission delay
-            - solution : <img src="images/intro/pipelining.png" height="100"/>
-            - $d_{trans} = (\sum \frac{L}{R_i}) + (N - 1) \frac{L}{R_{min}}$
-        - packet max size (bc pipelining)
-            - msg size = $M$ bits
-            - header size = $H$ bits
-            - max packet size = $K_{max}$ bits
-            - Number of bits to transmit = $M + H \lceil \frac{M}{K_{max}} \rceil$
-            - Time $T$ 
-                - without pipelining : $T = N (\frac{H + M}{R})$
-                - with pipelining : $T = \frac{1}{R} ((N - 1) K_{max} + M + H \lceil \frac{M}{K_{max}} \rceil)$ où N is nbr of links
-            - Average number of packets = $\frac{\overline{M}}{K_{max}} + \frac{1}{2}$
-            - $\overline{T} = \frac{1}{R} ((N - 1) K_{max} + \overline{M} + H (\frac{\overline{M}}{K_{max}} + \frac{1}{2}))$
-            - $K_{max} \approx \sqrt{\overline{M} \frac{H}{N - 1}}$
 
 - Error detection 
     - Parity bits 
