@@ -15,7 +15,6 @@
         - Composed of URI's
 - Principes des applications réseaux
     - communique par network
-    - Client process : init communication
     - Server process : wait for communication
     - Socket 
         - interface entre OS et network stack (Transport, Network, ...)
@@ -198,7 +197,7 @@
                 - 3-way handshake
                 - <img src="images/transport/three_way.png" height="100"/>
             - Congestion Control
-                - $\neq$ Flow control !
+                - != Flow control !
                 - To avoid to overwhelm the network (routers, link, ...)
                 - Ex : bottleneck link
                 - let `cwnd` adapting var for congestion window : how ?
@@ -251,6 +250,7 @@
                 - datagram Fragmentation 
                 - datagram reassembled at dest
         - Addressing and Subnetting $\Rightarrow$ TP
+            - <img src="images/network/ip_addr_class.png" height="100"/>
             - Formules 
                 - `net = addr & mask`
                 - `host = addr & !mask`
@@ -356,7 +356,52 @@
 - Error detection 
     - Parity bits 
     - Checksum
-    - Cyclic redundancy checks
+    - Cyclic redundancy codes (de degré $k$)(CRC-$k$)
+        - Maximize detection 
+        - Minimize overhead
+        - Principe 
+            - nombre binaire (ex : 1010) $\Rightarrow$ Polynome binaire ($x^3 + x$)
+            - Règles polynomes binaire 
+                - \+, \- : XOR
+                - \* : AND
+                - / : identité (seulement def pour 1)
+                - % : reste division entière
+            - Posons 
+                - $G(x)$ (Generator) un polynome de degré $k$ commun au receiver et au sender
+                - $M(x)$ (Message) un polynome de degré $n$ (le msg à envoyer)
+                - $R(x) = M(x) \cdot x^{16} \% G(x)$ un polynome
+                - $C(x) = M(x) \cdot x^{16} + R(x)$ le polynome envoyé
+                    - if $C(x)$ exact divisible par $G(x)$ : pas d'erreur
+                    - else : erreur
+
+- Medium Access Control (MAC) Protocols 
+    - For sharing the channel
+    - 3 types
+        - Channel Partitionning (FDM, TDM, ...)
+        - Random Access
+            - allows collision and recover from them
+            - ALOHA
+                - works with ACKs, if no ACK (collision) : retransmit
+                - Slotted ALOHA
+                    - increase success rate with time slots
+                    - require clock sync
+                - Carrier Sense Multiple Access (CSMA)
+                    - listen before transmit
+                        - if channel idle : transmit 
+                        - if channel busy : wait
+                    - cons : time is required to detect business
+                    - CSMA/CD (collsion detection)
+                        - minimum frame size 
+                        - no ACK
+        - Taking turns
+            - works with tokens
+
+- Ethernet 
+    - wired LAN tech
+    - star topo > bus topo
+    - no handshake
+    - unreliable : no ACK
+    - works with CSMA/CD
 
 ### Physical
 
