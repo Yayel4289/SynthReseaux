@@ -338,12 +338,18 @@
                     - msg size = $M$ bits
                     - header size = $H$ bits
                     - max packet size = $K_{max}$ bits
-                    - Number of bits to transmit = $M + H \lceil \frac{M}{K_{max}} \rceil$
+                    - number of packets: $n = \lceil \frac{M}{K_{max}} \rceil$
+                    - Number of bits to transmit = $M + H n$
+                    - N links
                     - Time $T$ 
                         - without pipelining : $T = N (\frac{H + M}{R})$
-                        - with pipelining : $T = \frac{1}{R} ((N - 1) K_{max} + M + H \lceil \frac{M}{K_{max}} \rceil)$ où N is nbr of links
-                    - Average number of packets = $\frac{\overline{M}}{K_{max}} + \frac{1}{2}$
-                    - $\overline{T} = \frac{1}{R} ((N - 1) K_{max} + \overline{M} + H (\frac{\overline{M}}{K_{max}} + \frac{1}{2}))$
+                        - with pipelining : $T = \frac{1}{R} ((N - 1) K_{max} + M + H n)$
+                            - why ? 
+                                - $T = T_1 + T_2$ where 
+                                    - $T_1 = \frac{1}{R} (M + H n) \Rightarrow $ time to transmit all bits 
+                                    - $T_2 = \frac{1}{R} ((N - 1) K_{max}) \Rightarrow $ it "slides" bc of pipelining
+                    - Average number of packets: $\overline{n} = \frac{\overline{M}}{K_{max}} + \frac{1}{2}$
+                    - $\overline{T} = \frac{1}{R} ((N - 1) K_{max} + \overline{M} + H \overline{n})$
                     - $K_{max} \approx \sqrt{\overline{M} \frac{H}{N - 1}}$
         - queueing
             - M/M/1 queueing model (theorical)
@@ -352,6 +358,8 @@
                 - $\mu$ avg pkt **departure** rate (pkts/s)
                 - $\rho = \frac{\lambda}{\mu}$ intensity (stable if < 1, 'inf' delay else)
                 - $\overline{N} = \rho (1 - \rho)$ avg nbr of pkts in q
+                - $\overline{d_{queue}} = \overline{N}L/R = \overline{N} d_{trans}$
+                    - in exercises, $\overline{d_{queue}}$ should involve these vars
             - delay depends on pkt arrival $\Rightarrow$ exos
             - packet loss (q has finite capacity)
 
