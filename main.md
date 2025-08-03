@@ -14,27 +14,27 @@
     - URL $\Rightarrow$ Uniform Resource Locator 
         - Composed of URI's
 - Principes des applications réseaux
-    - communique par network
-    - Server process : wait for communication
+    - Client-Server model
+        - Server process : **wait** for communication
+        - Client process : **initiates** communication 
     - Socket 
-        - interface entre OS et network stack (Transport, Network, ...)
+        - interface OS/network stack (Transport, Network, ...)
         - choix de protocole de transport (TCP, UDP)
         - Socket programming (tp)
-    - Adressing remote process $\Rightarrow$ IP adress + Port number
+    - Adressing remote process
+        - IP adress + Port number
     - Potential Requirements (motivate choice TCP or UDP)
-        - Reliable data transfer
-        - Timing
-        - Debit
-        - Security
+        - ex: reliable data transfer, timing, security, debit, ...
 
 - Protocols
     - Hyper Text Transfer Protocol (Secure) $\Rightarrow$ HTTP(S)
         - Uses URL to 
             - Address Objects
             - Send parameters (ex : "search=lorem", ...)
-        - Stateless $\Rightarrow$ Server maintains no info about past clients
+        - Stateless 
+            - Server maintains no info about past clients
         - Client-Server model
-        - Uses TCP (important order below)
+        - Uses TCP (important order)
             - Server listens TCP connections
             - Client initiates TCP connection to Server
             - Server Accepts
@@ -49,6 +49,7 @@
                         - `GET` $\Rightarrow$ retrieve object from Server
                         - `HEAD` $\Rightarrow$ `GET` for debugging, only headers
                         - `POST` $\Rightarrow$ send object to server
+                        - `PUT`, `DELETE`, ...
                 - response 
                     - Status codes ("X" means 1 digit)
                         - 1XX $\Rightarrow$ Info
@@ -76,13 +77,15 @@
                     - <img src="images/application/pipelining.png" height="200"/>
                     - $t = 2 \cdot RTT + \sum T_i$
 
-        - Cookies $\Rightarrow$ Keep state identification
+        - Cookies 
+            - Keep state identification
+                - How ? ID in HTTP request/response (+ database)
         - Proxy Server / Web Cache
             - Installed by local ISP
             - Acts as Client & Server
             - Browser forced to access Proxy 
             - Proxy works as an OS cache
-                - if object in cache : response to Client
+                - if object in cache and not modified since <last date> : response to Client
                 - else : request to origin Server
             - Avoid request to Server 
                 - Objective : reduce RTT
@@ -91,8 +94,9 @@
                 - Objective : reduce bandwidth usage
                 - Solution : conditional GET $\Rightarrow$ If-modified-since <date>
         - HTTP/2.0 
-            - Multiplexes concurrent requests in 1 TCP connection
-            - Reduces headers $\Rightarrow$ Binary Encoding
+            - Multiplex concurrent requests in 1 TCP connection + resource prioritization
+                - <img src="images/application/multi_prior.png" height="150"/>
+            - Compress headers $\Rightarrow$ Binary Encoding
             - Supports Server Push
                 - If 1 pushed object requires other objects $\Rightarrow$ Push Promise
                 - Ex : `index.html` pushed and requires `style.css`, `script.js`, ...
@@ -324,16 +328,16 @@
                 - $d$ physical link length (m)
                 - $s$ propagation speed (m/s)
             - formules et données
-                - $t_{trans} = \frac{L}{R}$ (transmission delay)
-                - $t_{propa} = \frac{d}{s}$ (propagation delay)
-                - $t_{proc}$ (processing delay, often negligible)
-                - $t_{queue}$ (queuing delay)
-                - $t_{nodal} = t_{trans} + t_{propa} + t_{proc} + t_{queue}$
+                - $d_{trans} = \frac{L}{R}$ (transmission delay)
+                - $d_{propa} = \frac{d}{s}$ (propagation delay)
+                - $d_{proc}$ (processing delay, often negligible)
+                - $d_{queue}$ (queuing delay)
+                - $d_{nodal} = d_{trans} + d_{propa} + d_{proc} + d_{queue}$
         - debit : $R \leq min(R_i) \Rightarrow$ bottleneck 
         - store and forward $\Rightarrow$ long transmission delay
             - solution : pipelining 
                 - <img src="images/intro/pipelining.png" height="100"/>
-                - $t_{trans} = (\sum \frac{L}{R_i}) + (N - 1) \frac{L}{R_{min}}$
+                - $d_{trans} = (\sum \frac{L}{R_i}) + (N - 1) \frac{L}{R_{min}}$
                 - packet max size
                     - msg size = $M$ bits
                     - header size = $H$ bits
@@ -467,7 +471,7 @@
         - Space Efficiency 
         - Ease of Delimiting
         - Ease of Parsing (trad msg)
-        - Data Transparency (must have the ability to carry **anything**)
+        - Data Transparency (must have the ability to carry **anything** $\Rightarrow$ /!\ Delimiting)
 
     - Examples 
         - Binary Encoding 
