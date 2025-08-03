@@ -163,8 +163,9 @@
         - so can tell if corrupted bit
     
 - Reliable Data Transfer (RDT) Principles
+    - try to understand / redo some state machines $\Rightarrow$ potential exam question
     - Assumptions
-        - Everything works $\Rightarrow$ RDT1.0
+        - Everything works fine $\Rightarrow$ RDT1.0
             - Ideal (not realistic) data transfer 
         - Bits may flip $\Rightarrow$ RDT2.0
             - Receiver verify msgs with Checksum and send : 
