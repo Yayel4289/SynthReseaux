@@ -101,7 +101,34 @@
                 - If 1 pushed object requires other objects $\Rightarrow$ Push Promise
                 - Ex : `index.html` pushed and requires `style.css`, `script.js`, ...
 
+    - Simple Mail Transfer Protocol $\Rightarrow$ SMTP 
+        - Uses TCP
+        - Commands ($\approx$ requests) in ASCII
+        - Responses : status code + phrase
+        - Transfer 
+            - Handshake 
+            - Message transfer 
+            - Closure
+        - Mail access protocols 
+            - <img src="images/application/mail_access_protocols.png" height="75"/>
+            - Post Office Protocol $\Rightarrow$ POP 
+                - POP3 tp
+            - Internet Mail Access Protocol $\Rightarrow$ IMAP
+            - HTTP
+
     - Domain Name System $\Rightarrow$ DNS
+        - Servers and Structure
+            - <img src="images/application/dns.png" height="200"/>
+            - Exists because a centralized DNS is bad 
+                - Single point of failure 
+                - Traffic Volume 
+                - Distant from everything,
+                - ...
+            - Top-Level Domains $\Rightarrow$ TLD
+                - com
+                - edu 
+                - org 
+                - ...
         - Resource Records (also RR)
             - = entry in DNS database
             - Format : domain name, value, type, TTL (time-to-live)
@@ -110,10 +137,6 @@
         - Local Name Server 
             - Each local ISP has at least one
             - $\approx$ Proxy
-        - Top-Level Domains $\Rightarrow$ TLD
-            - edu 
-            - org 
-            - ...
         - Map : IP adress $\Leftrightarrow$ Hostname
             - Hostname $\Rightarrow$ IP adress : Name Resolution
                 - Recursive Name Resolution
@@ -121,9 +144,8 @@
                 - Iterative Name Resolution
                     - <img src="images/application/iterative_name_resol.png" height="100"/>
             - IP address $\Rightarrow$ Hostname : Reverse Lookup
+                - IP addresses translated to string and searched (from end always)
                     
-        - Servers and Structure
-            - <img src="images/application/serv_struct.png" height="100"/>
         - DNS tool $\Rightarrow$ `dig` (tp)
 
 
