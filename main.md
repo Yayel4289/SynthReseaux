@@ -250,11 +250,22 @@ markmap:
                         - inductive form 
                             - $SRTT_0 = R_0$
                             - $SRTT_i = (1 - \alpha) SRTT_{i-1} + \alpha R_i$
-                        - general form (easy to retrieve from inductive)
-                            - $SRTT_i = \sum_{k=0}^{i} \alpha (1 - \alpha)^{i - k} R_k$
-            - Fast retransmit 
+                        - general form (ok to retrieve from inductive)
+                            - $SRTT_i = \sum_{k=0}^i \alpha (1 - \alpha)^{i - k} R_k = \alpha \sum_{k=0}^i (1 - \alpha)^{i - k} R_k$
+                        - not enough to follow RTT !
+                    - Safety margin 
+                        - weight $\Rightarrow \beta$ ( = 0.25 usually)
+                        - inductive form 
+                            - $DevRTT_0 = R_0 / 2$
+                            - $DevRTT_i = (1 - \beta) DevRTT_{i - 1} + \beta | SRTT_i - R_i |$
+                        - general form (as ok as SRTT)
+                            - $DevRTT_i = \sum_{k = 0}^i \beta (1 - \beta)^{i - k} |SRTT_k - R_k| = \beta \sum_{k = 0}^i (1 - \beta)^{i - k} |SRTT_k - R_k|$
+                    - $RT0_i = SRTT_i + 4 DevRTT_i$
+                        - if timer expires, $RTO \leftarrow 2 RTO$
+            - Fast retransmit
+                - <img src="images/transport/fast_retransmit.png" height="100"/>
                 - Detect lost segments via duplicates (3) ACKs
-                - Directly resend
+                - Directly resend 
         - Flow control
             - Match Edge service speed (no overwhelm to receiver)
             - How ? receive window `rwnd` var sent by receiver
