@@ -1,6 +1,20 @@
-# Réseaux
+---
+title: Réseaux
+markmap:
+    spacingVertical: 10
+    spacingHorizontal: 100
+    colorFreezeLevel: 3
+    color:
+        - cyan
+        - white
+        - red 
+        - orange 
+        - yellow 
+        - green 
+        - '#22f'
+---
 
-## <img src="images/layers.png" height="200"/>
+## ![](images/layers.png)
 
 ### Application
 
@@ -149,7 +163,6 @@
         - DNS tool $\Rightarrow$ `dig` (tp)
 
 
-
 ### Transport
 
 - Termes techniques
@@ -183,87 +196,112 @@
             - timeout for ACK's
             - <img src="images/transport/rdt30.png" height="100"/>
             - base perf stinks $\Rightarrow$ solution :
+                - sequence number : 0 $\rightarrow$ n
                 - pipelining : 2 ways 
                     - Go-Back-N
-                        - sequence number : 0 $\rightarrow$ n
                         - discard out of order pkts if pkt loss
-                        - <img src="images/transport/go_back_n.png" height="100"/>
+                            - <img src="images/transport/go_back_n.png" height="100"/>
+                        - ACK loss but sequence number $\nearrow \  \Rightarrow$ Sender knows Receiver ACK'd 
+                            - <img src="images/transport/go_back_n2.png" height="100"/>
+                        
                     - Selective repeat
-                        - $\approx$ Go-Back-n but doesn't discard out of order pkts
-                        - <img src="images/transport/selective_repeat.png" height="100"/>
-            
+                        - just timeout for pkt / ACK loss
+                            - <img src="images/transport/selective_repeat.png" height="100"/>
+                            - <img src="images/transport/selective_repeat2.png" height="100"/>
+                            
+                        - but problem : cyclic number can be misinterpreted
+                            - <img src="images/transport/selective_repeat_dilemma.png" height="100"/>
+                            - solution $\Rightarrow 2^M \geq 2N$ (bc worst case is Receiver one window in advance of Sender)
+
 - Protocols 
-    - Unavailable Services 
-        - delay guarantees
-        - bandwidth guarantees
-    - De/Multiplexing $\Rightarrow$ by header
-    - Concrete Protocols
-        - Transmission Control Protocol $\Rightarrow$ TCP 
-            - Nagle's algo 
-                - MSS $\Rightarrow$ Maximum Segment Size
-                - algo $\Rightarrow$ fill full segment before sending 
-                    - full segment sent = send window $\Rightarrow$ "sliding window"
-                    - exception with unACK'd segments : push immediately
-            - Constant estimation of RTT for RTO (Retransmission TimeOut)
-            - Reliable data transfer 
-                - Fast retransmit 
-                    - Detect lost segments via duplicates (3) ACKs
-                    - Directly resend
-            - Flow control
-                - Match Edge service speed (no overwhelm to receiver)
-                - How ? receive window `rwnd` var sent by receiver
-                    - if `rwnd = 0` : stop sending
-                    - if `rwnd > 0` : send `rwnd` segment
-                - Silly Window Syndrome 
-                    - Risk of slowing down a lot 
-                    - Ex : `rwnd = 1` and 1 byte to be sent *constantly*
-                    - Solutions 
-                        - Avoid too small `rwnd` (receiver part)
-                        - Avoid sendind too small segments (sender part)
-            - Connection Managment 
-                - 3-way handshake
-                - <img src="images/transport/three_way.png" height="100"/>
-            - Congestion Control
-                - != Flow control !
-                - To avoid to overwhelm the network (routers, link, ...)
-                - Ex : bottleneck link
-                - let `cwnd` adapting var for congestion window : how ?
-                    - Slow Start
-                        - Fast Actually $\Rightarrow$ exponential
-                        - `cwnd += 1*MSS` every **ACK**
-                    - Additive Increase, Multiplicative Decrease (AIMD)
-                        - let `ssthresh` slow start threshold(=seuil)
-                            - at beginning : set to large value
-                            - after loss : `ssthresh = cwnd / 2`
-                        - AIMD activates when `cwnd == ssthresh`
-                        - Linear
-                        - `cwnd += 1*MSS` every **RTT**
-                        - `cwnd /= 2` if loss
-                            - detected after 3 dup ACKs $\Rightarrow$ Fast Recovery
-                    - if timeout : `cwnd = 1` and Slow Start
-
-            - Selective ACK (SACK) : if 1 pkt loss but next ones received $\Rightarrow$ notify
-
-            - Fair due to AIMD
-
-            - Multiplexing : `header = (srcIP, dstIP, srcPort, dstPort)`
-
-            - $\overline{Throughput} = \frac{\overline{W}}{RTT}$ ($\overline{W}$ is avg window size)
-            
-            - mnemo : Tu Communique Précautionneusement
-
-        - User Datagram Protocol $\Rightarrow$ UDP
-            - connectionless $\Rightarrow$ no handshake
-            - uses Checksum
-            - \+ 
-                - fast (ex : no handshake)
-            - \- 
-                - unreliable data transfer
-            - why if tcp exists ? video games, streaming $\Rightarrow$ when time is more important
-
-            - Multiplexing : `header = (dstIP, dstPort)`
-
-            - mnemo : Ultra Direct Pratique
+    - Transmission Control Protocol $\Rightarrow$ TCP 
+        - Segment structure
+            - Maximum Segment Size $\Rightarrow$ MSS 
+                - restrained by MTU (Maximum Transmission Unit)
+                    - <img src="images/transport/mss.png" height="70"/>
+                - MSS Trade-off
+                    - if MSS too large $\Rightarrow$ fragmentation (IP datagrams might be too large for certain links)
+                    - if MSS too low $\Rightarrow$ too much TCP/IP header overhead
+                - MSS negotiation 
+                    - TCP can announce MSS to incoming TCP segments to readjust
+                - Nagle's algo 
+                    - solution for small-pkt problem (small msgs apps)
+                    - functioning
+                        - if no coming ACK : send immediately 
+                        - else : send when 
+                            - previous pkt is ACK'd 
+                            - segment size reached MSS
+            - Content 
+                - source port nbr 
+                - dest port nbr 
+                - sequence nbr 
+                - ACK nbr 
+                - flags (ACK, etc)
+                - checksum 
+                - options (SACK, MSS, etc)
+                - ...
+        - Reliable data transfer 
+            - Retransmission TimeOut $\Rightarrow$ RTO 
+                - Depends of RTT $\Rightarrow$ need to constantly estimate RTT
+                    - $R_i$ = time between seg transmission and its ACK
+                    - Smoothed RTT $\Rightarrow SRTT$
+                    - Exponentially Weighted Moving Average $\Rightarrow$ EWMA
+                        - weight $\Rightarrow \alpha$ ( = 0.125 usually)
+                        - inductive form 
+                            - $SRTT_0 = R_0$
+                            - $SRTT_i = (1 - \alpha) SRTT_{i-1} + \alpha R_i$
+                        - general form (easy to retrieve from inductive)
+                            - $SRTT_i = \sum_{k=0}^{i} \alpha (1 - \alpha)^{i - k} R_k$
+            - Fast retransmit 
+                - Detect lost segments via duplicates (3) ACKs
+                - Directly resend
+        - Flow control
+            - Match Edge service speed (no overwhelm to receiver)
+            - How ? receive window `rwnd` var sent by receiver
+                - if `rwnd = 0` : stop sending
+                - if `rwnd > 0` : send `rwnd` segment
+            - Silly Window Syndrome 
+                - Risk of slowing down a lot 
+                - Ex : `rwnd = 1` and 1 byte to be sent *constantly*
+                - Solutions 
+                    - Avoid too small `rwnd` (receiver part)
+                    - Avoid sendind too small segments (sender part)
+        - Connection Managment 
+            - 3-way handshake
+            - <img src="images/transport/three_way.png" height="100"/>
+        - Congestion Control
+            - != Flow control !
+            - To avoid to overwhelm the network (routers, link, ...)
+            - Ex : bottleneck link
+            - let `cwnd` adapting var for congestion window : how ?
+                - Slow Start
+                    - Fast Actually $\Rightarrow$ exponential
+                    - `cwnd += 1*MSS` every **ACK**
+                - Additive Increase, Multiplicative Decrease (AIMD)
+                    - let `ssthresh` slow start threshold(=seuil)
+                        - at beginning : set to large value
+                        - after loss : `ssthresh = cwnd / 2`
+                    - AIMD activates when `cwnd == ssthresh`
+                    - Linear
+                    - `cwnd += 1*MSS` every **RTT**
+                    - `cwnd /= 2` if loss
+                        - detected after 3 dup ACKs $\Rightarrow$ Fast Recovery
+                - if timeout : `cwnd = 1` and Slow Start
+        - Selective ACK (SACK) : if 1 pkt loss but next ones received $\Rightarrow$ notify
+        - Fair due to AIMD
+        - Multiplexing : `header = (srcIP, dstIP, srcPort, dstPort)`
+        - $\overline{Throughput} = \frac{\overline{W}}{RTT}$ ($\overline{W}$ is avg window size)
+        - mnemo : Tu Communique Précautionneusement
+    - User Datagram Protocol $\Rightarrow$ UDP
+        - connectionless $\Rightarrow$ no handshake
+        - uses Checksum
+        - \+ 
+            - fast (ex : no handshake)
+        - \- 
+            - unreliable data transfer
+        - why if tcp exists ? video games, streaming $\Rightarrow$ when time is more important
+        - Multiplexing : `header = (dstIP, dstPort)`
+        - mnemo : Ultra Direct Pratique
 
 ### Network
 
@@ -440,7 +478,7 @@
     - unreliable : no ACK
     - works with CSMA/CD
 
-### Physical
+### Physical <!-- markmap: fold -->
 
 - Termes techniques
     - Modem : modulateur - démodulateur de signaux (analogique $\Leftrightarrow$ digital)
