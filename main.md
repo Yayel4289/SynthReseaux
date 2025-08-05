@@ -239,6 +239,7 @@ markmap:
                 - flags (ACK, etc)
                 - checksum 
                 - options (SACK, MSS, etc)
+                - receive windown `rwnd` (flow control)
                 - ...
         - Reliable data transfer 
             - Retransmission TimeOut $\Rightarrow$ RTO 
@@ -267,42 +268,54 @@ markmap:
                 - Detect lost segments via duplicates (3) ACKs
                 - Directly resend 
         - Flow control
-            - Match Edge service speed (no overwhelm to receiver)
+            - Matches sender speed and receiver drain
             - How ? receive window `rwnd` var sent by receiver
                 - if `rwnd = 0` : stop sending
                 - if `rwnd > 0` : send `rwnd` segment
+                - sender might not receive `rwnd` info
+                    - send window probe (= sonde) every *persist timer* time
             - Silly Window Syndrome 
                 - Risk of slowing down a lot 
-                - Ex : `rwnd = 1` and 1 byte to be sent *constantly*
+                - Ex : `rwnd = 1` and 1 byte to be sent constantly
                 - Solutions 
-                    - Avoid too small `rwnd` (receiver part)
-                    - Avoid sendind too small segments (sender part)
+                    - Avoid annoucing `rwnd < MSS` (receiver part)
+                    - OR
+                    - Avoid sendind too small segments (sender part) $\Rightarrow$ Nagle's algo
+            - $Throughput \approx \frac{rwnd}{RTT}$
+            - Options to scale `rwnd` to `rwnd`$\cdot 2^N$
         - Connection Managment 
             - 3-way handshake
-            - <img src="images/transport/three_way.png" height="100"/>
+                - <img src="images/transport/three_way.png" height="100"/>
+            - closing 
+                - <img src="images/transport/closing.png" height="100"/>
+            - TCP connection management state machine 
+                - <img src="images/transport/tcp_sm.png" height="100"/>
         - Congestion Control
-            - != Flow control !
-            - To avoid to overwhelm the network (routers, link, ...)
-            - Ex : bottleneck link
-            - let `cwnd` adapting var for congestion window : how ?
+            - To avoid to overwhelm the network (routers, link, ...) (!= flow ctrl)
+            - let `cwnd` adapting var for congestion window
                 - Slow Start
-                    - Fast Actually $\Rightarrow$ exponential
-                    - `cwnd += 1*MSS` every **ACK**
+                    - `cwnd = 1*MSS`
+                    - `cwnd += nbr_ACK*MSS` **every RTT** (exponential)
                 - Additive Increase, Multiplicative Decrease (AIMD)
                     - let `ssthresh` slow start threshold(=seuil)
                         - at beginning : set to large value
                         - after loss : `ssthresh = cwnd / 2`
-                    - AIMD activates when `cwnd == ssthresh`
-                    - Linear
-                    - `cwnd += 1*MSS` every **RTT**
-                    - `cwnd /= 2` if loss
-                        - detected after 3 dup ACKs $\Rightarrow$ Fast Recovery
-                - if timeout : `cwnd = 1` and Slow Start
-        - Selective ACK (SACK) : if 1 pkt loss but next ones received $\Rightarrow$ notify
+                    - AIMD activates when `cwnd >= ssthresh` $\Rightarrow$ Congestion avoidance
+                    - `cwnd += 1*MSS` **every RTT**
+                    - if loss (detected by 3 dup ACKs) $\Rightarrow$ Fast recovery
+                        - `cwnd = ssthresh = cwnd / 2`
+                    - if timeout (no ACK for too long = congestion) 
+                        - `ssthresh = cwnd / 2`
+                        - `cwnd = 1*MSS` (Slow start again)
+                    - Throughput (congestion avoidance)
+                        - <img src="images/transport/tcp_debit.png" height="100"/>
+        - Selective ACK (SACK)
+            - reduces retransmission duplicates
+            - ex 
+                - pkts sent : 1 2 3 4 5 6 7 but 3 4 lost ! 
+                - Receiver sends ACK(2) AND SACK 5-7
+                - Sender retransmits 3 4 instead of 3-7
         - Fair due to AIMD
-        - Multiplexing : `header = (srcIP, dstIP, srcPort, dstPort)`
-        - $\overline{Throughput} = \frac{\overline{W}}{RTT}$ ($\overline{W}$ is avg window size)
-        - mnemo : Tu Communique Précautionneusement
     - User Datagram Protocol $\Rightarrow$ UDP
         - connectionless $\Rightarrow$ no handshake
         - uses Checksum
@@ -311,8 +324,6 @@ markmap:
         - \- 
             - unreliable data transfer
         - why if tcp exists ? video games, streaming $\Rightarrow$ when time is more important
-        - Multiplexing : `header = (dstIP, dstPort)`
-        - mnemo : Ultra Direct Pratique
 
 ### Network
 
