@@ -329,13 +329,15 @@ markmap:
 
 - Protocols
     - Internet Protocol $\Rightarrow$ IP
+        - Format 
+            - insert img (dont know yet)
+            - Fragmentation 
+                - flags in header 
+                    - Don't Fragment $\Rightarrow$ DF 
+                    - More Fragment $\Rightarrow$ MF 
+                    - unused
         - IP Adress $\Rightarrow$ identifies host device
             - ex : gaia.cs.umass.edu $\Rightarrow$ 128.119.245.12
-        - Fragmentation 
-            - links have a MTU $\Rightarrow$ Maximum Transfer Size
-            - if datagram length > link MTU
-                - datagram Fragmentation 
-                - datagram reassembled at dest
         - Addressing and Subnetting $\Rightarrow$ TP
             - <img src="images/network/ip_addr_class.png" height="100"/>
             - Formules 
@@ -355,6 +357,23 @@ markmap:
             
 
 - Router 
+    - Architecture 
+        - <img src="images/network/router_arch.png" height="100"/>
+        - Switching fabrics 
+            - Memory (1st gen)
+                - Architecture like computers 
+                - pkts copied to memory 
+                - CPU controls switching
+            - Bus (2nd gen)
+                - Fwding cache / line + CPU $\Rightarrow$ faster
+                - <img src="images/network/bus.png" height="100"/>
+            - Crossbar (3rd gen)
+                - <img src="images/network/crossbar.png" height="100"/>
+                - can be difficult to addess $N \times M$ points
+        - Head-Of-Line (HOL) blocking 
+            - <img src="images/network/hol.png" height="100"/>
+            - solution $\Rightarrow$ split input into queues for != outputs
+                    
     - Routing algorithms 
         - Def : determining path taken by pkts from src to dest
         - 2 types 
@@ -366,22 +385,7 @@ markmap:
 
 - Switching 
     - Def : defines how a network element forwards data with its header
-    - Needed by Routing
-    - Types of networks
-        - Virtual Circuit (VC) networks
-            - virutal circuits (paths) must be setup before traffic
-            - Pkt forwarding depends on header (VC number)
-            - intelligence in network (dumb end systems)
-            - guaranteed services : debit, latency
-            - Ex : Circuit Switching
-        - Datagram networks
-            - no setup
-            - pkt header contains dest
-            - every router must knpw how to reach dest !
-            - Uses IP
-            - intelligence at edge
-            - best effort service
-
+    - Circuit Switching or Packet Switching
 
     
 - Network Structure
