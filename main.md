@@ -336,52 +336,118 @@ markmap:
                     - Don't Fragment $\Rightarrow$ DF 
                     - More Fragment $\Rightarrow$ MF 
                     - unused
-        - IP Adress $\Rightarrow$ identifies host device
-            - ex : gaia.cs.umass.edu $\Rightarrow$ 128.119.245.12
-        - Addressing and Subnetting $\Rightarrow$ TP
-            - <img src="images/network/ip_addr_class.png" height="100"/>
-            - Formules 
-                - `net = addr & mask`
-                - `host = addr & !mask`
-                - `(other_addr & mask) == (addr & mask)`
-                - `(other_addr ^ addr) & mask == 0`
+                - for exercises, remember IP header = TCP header = 20B
+        - Addressing
+            - Classful addressing
+                - <img src="images/network/ip_addr_class.png" height="100"/>
+            - Subnetting 
+                - \>\< Classful addressing 
+                - idea : take an IP address and share it
+                - prefix-length (bc no class)
+                    - distinguish net and host 
+                    - ex : `171.18.32.36/19`
+                        - `mask = 255.255.224.0`
+                        - `net = 171.18.32.0`
+                        - `host = 0.0.0.36`
+                - Formules 
+                    - `net = addr & mask`
+                    - `host = addr & !mask`
+                    - `(other_addr & mask) == (addr & mask)` (to see if `addr` and `other_addr` are in the same subnet)
+                    - `(other_addr ^ addr) & mask == 0` (same)
+                - the subnet is made in the host part
+                - when subnetting, the host part can't have 
+                    - the lowest addr $\Rightarrow$ network addr
+                    - the highest addr $\Rightarrow$ broadcast
+                    - doesnt apply for links since smart routers on ends
         - Forwarding
             - Forwarding table
                 - <img src="images/network/forwarding_table.png" height="100"/>
             - Longest Prefix Matching (LPM) (self exp)
-                - Implementation with b-tree
+                - Software Implementation with b-tree (trie)
                     - bit = 0 $\Rightarrow$ Left
                     - bit = 1 $\Rightarrow$ Right
-                    - <img src="images/network/lpm.png" height="100"/>
-            - Subnetting $\Rightarrow$ TP
-            
-
-- Router 
-    - Architecture 
-        - <img src="images/network/router_arch.png" height="100"/>
-        - Switching fabrics 
-            - Memory (1st gen)
-                - Architecture like computers 
-                - pkts copied to memory 
-                - CPU controls switching
-            - Bus (2nd gen)
-                - Fwding cache / line + CPU $\Rightarrow$ faster
-                - <img src="images/network/bus.png" height="100"/>
-            - Crossbar (3rd gen)
-                - <img src="images/network/crossbar.png" height="100"/>
-                - can be difficult to addess $N \times M$ points
-        - Head-Of-Line (HOL) blocking 
-            - <img src="images/network/hol.png" height="100"/>
-            - solution $\Rightarrow$ split input into queues for != outputs
+                    - <img src="images/network/software_lpm.png" height="100"/>
+                - Hardware Implementation with Ternary Content-Addressable Memory (TCAM)
+                    - <img src="images/network/hardware_lpm.png" height="100"/>
+                    - Ternary
+                        - 0, 1 or x (might be both)
+                    - Content-Adressable Memory 
+                        - Search to all entries in parallel $\Rightarrow$ perf++
+        - How to get IP address ?
+            - networks 
+                - <img src="images/network/hierarchy.png" height="100"/>
+                - bottom network gets allocated addr space from above
+                - easier forward IP addr (unless user changes IPS for example)
+            - users 
+                - static config 
+                    - by network admin
+                    - OS can handle
+                - dynamic congig 
+                    - link-local addresses
+                        - automatic random addr given
+                    - DHCP (best)
+        - Network Address Translation $\Rightarrow$ NAT
+            - Map network (green) and local (red) IP addresses 
+                - <img src="images/network/nat.png" height="100"/>
+            - Problem 
+                - the local address isnt visible externally
+                - Solutions but controversial
+                    - violates end-to-end
+                    - break some application layer protocols
+        - IPv6
+            - motivation 
+                - ipv4 almost completely allocated 
+                - perf++
+            - how to transition ? 
+                - Tunneling 
+                    - <img src="images/network/tunnel.png" height="100"/>
                     
-    - Routing algorithms 
-        - Def : determining path taken by pkts from src to dest
-        - 2 types 
-            - Link State Routing Protocol
-                - Link State Packet (LSP) Flooding
-                    - Construction of Link State DataBase (LSDB)
-                - Dijkstra algo (voir slides)
-            - Distance Vector Protocol (voir projet)
+
+    - Dynamic Host Configuration Protocol $\Rightarrow$ DHCP
+        - allows host to dynamically optain IP address
+        - uses UDP
+        - functioning 
+            - client asks for IP addr to servers
+                - <img src="images/network/dhcp_discover.png" height="100"/>
+            - 3 timers starts if connected : `T1 < T2 < Lease`
+                - `T1 expires` $\Rightarrow$ request to same server
+                - `T2 expires` $\Rightarrow$ request all accessible servers ('needs help' bc its serv left it)
+                - `Lease expires` $\Rightarrow$ deconnection
+        - can use relays
+        - relies a lot on options encoded in TLV
+
+    - Internet Control Message Protocol $\Rightarrow$ ICMP 
+        - error / reachability reporting
+        - multiple pkts sent with TTL = 1,2,3,... until dst reached
+        - <img src="images/network/icmp.png" height="100"/>
+        - can also discover MTU and notice src
+
+
+
+
+- Router Architecture 
+    - <img src="images/network/router_arch.png" height="100"/>
+    - Switching fabrics 
+        - Memory (1st gen)
+            - Architecture like computers 
+            - pkts copied to memory 
+            - CPU controls switching
+        - Bus (2nd gen)
+            - Fwding cache / line + CPU $\Rightarrow$ faster
+            - <img src="images/network/bus.png" height="100"/>
+        - Crossbar (3rd gen)
+            - <img src="images/network/crossbar.png" height="100"/>
+            - can be difficult to addess $N \times M$ points
+    - Head-Of-Line (HOL) blocking 
+        - <img src="images/network/hol.png" height="100"/>
+        - solution $\Rightarrow$ split input into queues for != outputs
+                
+- Routing algorithms 
+    - Link State Routing Protocol
+        - Link State Packet (LSP) Flooding
+            - Each router sends neighbors / costs to its neighbors with LSPs
+        
+    - Distance Vector Protocol (voir projet)
 
 - Switching 
     - Def : defines how a network element forwards data with its header
