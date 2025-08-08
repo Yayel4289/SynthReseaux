@@ -11,7 +11,7 @@ markmap:
         - orange 
         - yellow 
         - green 
-        - '#22f'
+        - blue
 ---
 
 ## ![](images/layers.png)
@@ -592,47 +592,57 @@ markmap:
             - packet loss (q has finite capacity)
 
 - Error detection 
-    - Parity bits 
-    - Checksum
+    - Checksum (alreay seen in RDT)
+    - Single-bit Parity checking 
+        - focus on number of 1's
+        - even-parity
+            - makes the sequence even
+            - ex
+                - 001010010**1**
+                - 001000010**0**
+        - odd-parity 
+            - makes the sequence odd
+            - ex 
+                - 001000010**1**
+                - 001010010**0**
     - Cyclic redundancy codes (de degré $k$)(CRC-$k$)
-        - Maximize detection 
-        - Minimize overhead
+        - detection++, overhead--
         - Principe 
-            - nombre binaire (ex : 1010) $\Rightarrow$ Polynome binaire ($x^3 + x$)
-            - Règles polynomes binaire 
+            - binary seq (ex : 1010) $\Rightarrow$ binary polynomial ($x^3 + x$)
+            - binary polynomials arithmetics 
                 - \+, \- : XOR
-                - \* : AND
-                - / : identité (seulement def pour 1)
-                - % : reste division entière
-            - Posons 
-                - $G(x)$ (Generator) un polynome de degré $k$ commun au receiver et au sender
-                - $M(x)$ (Message) un polynome de degré $n$ (le msg à envoyer)
-                - $R(x) = M(x) \cdot x^{16} \% G(x)$ un polynome
-                - $C(x) = M(x) \cdot x^{16} + R(x)$ le polynome envoyé
-                    - if $C(x)$ exact divisible par $G(x)$ : pas d'erreur
-                    - else : erreur
+            - let polynomials
+                - $M(x)$ (Message) deg $n$ (msg to send)
+                - $G(x)$ (Generator) deg $k$ sender and receiver agree on
+                - $R(x) = M(x) \cdot x^k \% G(x)$ 
+                - $C(x) = M(x) \cdot x^k + R(x) \Rightarrow$ the sent Codeword
+                    - if $C(x)$ exactly divisible by $G(x)$ : ok
+                    - else : error
 
 - Medium Access Control (MAC) Protocols 
     - For sharing the channel
+    - if frame collision at a station : unreadable
     - 3 types
         - Channel Partitionning (FDM, TDM, ...)
         - Random Access
             - allows collision and recover from them
             - ALOHA
                 - works with ACKs, if no ACK (collision) : retransmit
-                - Slotted ALOHA
-                    - increase success rate with time slots
-                    - require clock sync
-                - Carrier Sense Multiple Access (CSMA)
-                    - listen before transmit
-                        - if channel idle : transmit 
-                        - if channel busy : wait
-                    - cons : time is required to detect business
-                    - CSMA/CD (collsion detection)
-                        - minimum frame size 
-                        - no ACK
-        - Taking turns
-            - works with tokens
+                - collisions with frame overlaps
+            - Slotted ALOHA
+                - \+ increase success rate with time slots
+                - \- require clock sync
+            - Carrier Sense Multiple Access (CSMA)
+                - also works with ACKs, if no ACK (collision) : retransmit
+                - listen before transmit
+                    - if channel idle : transmit 
+                    - if channel busy : wait
+                - cons : time is required to detect business
+            - CSMA/CD (collision detection)
+                - minimum frame size 
+                - no ACK
+                - $d_{trans} >= 2 d_{propa} \Rightarrow$ all collisions detected
+        - Taking turns (with tokens)
 
 - Ethernet 
     - wired LAN tech
