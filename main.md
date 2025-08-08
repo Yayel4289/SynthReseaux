@@ -330,13 +330,13 @@ markmap:
 - Protocols
     - Internet Protocol $\Rightarrow$ IP
         - Format 
-            - insert img (dont know yet)
-            - Fragmentation 
-                - flags in header 
-                    - Don't Fragment $\Rightarrow$ DF 
-                    - More Fragment $\Rightarrow$ MF 
-                    - unused
-                - for exercises, remember IP header = TCP header = 20B
+            - <img src="images/network/ip_header.png" height="100"/>
+        - Fragmentation 
+            - flags in header 
+                - Don't Fragment $\Rightarrow$ DF 
+                - More Fragment $\Rightarrow$ MF 
+                - unused
+            - for exercises, remember IP header = TCP header = 20B
         - Addressing
             - Classful addressing
                 - <img src="images/network/ip_addr_class.png" height="100"/>
@@ -444,10 +444,81 @@ markmap:
                 
 - Routing algorithms 
     - Link State Routing Protocol
+        - routers 'know' the whole map
         - Link State Packet (LSP) Flooding
-            - Each router sends neighbors / costs to its neighbors with LSPs
-        
-    - Distance Vector Protocol (voir projet)
+            - Each router sends an `LSP`, containing 
+                - its `id`
+                - the costs to reach its neighbors
+                - `seq_nbr` (increment every LSP flood)
+                    - allows to deal with link failures / changes
+                - `age` (decrement regularly)
+                    - `if age == 0: del LSP`
+                    - allows to deal with router failures / reboot
+                    - LSP flooding required sometimes
+        - Link State DataBase (LSDB)
+            - ```py
+                # when router receives LSP
+                if (LSP.id not in LSDB) or (LSP.seq_nbr > LSDB[LSP.id].seq_nbr):
+                    LSDB[LSP.id] = LSP
+                    send_to_neighbors(LSP)
+            ```
+        - Dijkstra
+            - variables 
+                - `c(x, y)` : cost from `x` to `y`
+                - `D(v)` : current cost (estimation) from src to `v`
+                - `p(v)` : current predecessor (estimation) to reach `v`
+                - `N'` : set of nodes whose min cost path is def known
+            - relaxation 
+                - ```py
+                    def relax(u, v):
+                        if D(u) + c(u, v) < D(v):
+                            D(v) = D(u) + c(u, v)
+                            p(v) = u
+                ```
+            - algo 
+                - ```py
+                    def dijkstra(G=(V,E), src):
+                        D(src) = 0
+                        N' = set()
+                        for v in V - {src}:
+                            D(v) = inf 
+                            p(v) = None
+
+                        while (N' != V):
+                            find (u not in N') with D(u) is minimum
+                            N'.add(u)
+                            for v in u.neighbors:
+                                relax(u, v)
+                ```
+
+    - Distance Vector Protocol
+        - routers only 'know' their neighbors
+        - Distance Vector (DV) : costs / dest obtained by neighbors
+        - Bellman-Ford equation 
+            - $d_x(y) = \min _v (c(x, v) + d_v(y))$
+            - $d_v(v) = 0$ (base)
+        - each router $x$
+            - maintains
+                - its own DV $D_x = D_x(y) | y \in V$
+                - its neighbors' $v$ DVs $D_v(y) | y \in V$
+            - update its own DV using Bellman-Ford when 
+                - neighbors send their updated DV
+                - local links fail / change cost ($c(x, v)$)
+            - share its own DV after update
+        - count-to-infinity problem 
+            - illustrations 
+                - <img src="images/network/count_to_inf/1.png" height="100"/>
+                - <img src="images/network/count_to_inf/2.png" height="100"/>
+                - <img src="images/network/count_to_inf/3.png" height="100"/>
+                - <img src="images/network/count_to_inf/4.png" height="100"/>
+            - explanations
+                - $y$ announces to $z$ a cost for a route to $x$ that goes through $z$ !
+                - so $z$ updates its DV and sends it to $y$
+                - ...
+            - solution 
+                - poisoned reverse 
+                    - <img src="images/network/count_to_inf/pr.png" height="100"/>
+
 
 - Switching 
     - Def : defines how a network element forwards data with its header
