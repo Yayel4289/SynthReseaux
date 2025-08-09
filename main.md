@@ -1,5 +1,5 @@
 ---
-title: Réseaux
+title: Computer Networks
 markmap:
     spacingVertical: 15
     spacingHorizontal: 105
