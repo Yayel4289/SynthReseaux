@@ -1,7 +1,7 @@
 ---
 title: Réseaux
 markmap:
-    spacingVertical: 10
+    spacingVertical: 15
     spacingHorizontal: 100
     colorFreezeLevel: 3
     color:
@@ -622,6 +622,7 @@ markmap:
 - Medium Access Control (MAC) Protocols 
     - For sharing the channel
     - if frame collision at a station : unreadable
+        - <img src="images/link/collision.png" height="20"/>
     - 3 types
         - Channel Partitionning (FDM, TDM, ...)
         - Random Access
@@ -642,14 +643,65 @@ markmap:
                 - minimum frame size 
                 - no ACK
                 - $d_{trans} >= 2 d_{propa} \Rightarrow$ all collisions detected
-        - Taking turns (with tokens)
+        - Taking turns
+            - master manages turns (bad)
+            - token passing (better)
 
-- Ethernet 
-    - wired LAN tech
-    - star topo > bus topo
-    - no handshake
-    - unreliable : no ACK
-    - works with CSMA/CD
+- Link layer address
+    - = Ethernet address = MAC address
+    - **only used within a Local Area Network (LAN)**
+    - Format 
+        - 48 bits long, hex for humans
+        - 2 parts 
+            - Oranizationnally Unique Identifier $\Rightarrow$ OUI
+                - 1st bit $\Rightarrow$ I/G
+                    - 0 = Individual (unicast)
+                    - 1 = Group (broad/multi cast)
+                - 2nd bit $\Rightarrow$ U/L
+                    - 0 = Universal
+                    - 1 = Local
+            - Vendor-specific part 
+    - Address Resolution Protocol $\Rightarrow$ ARP
+        - IP $\Leftrightarrow$ MAC address mapping 
+        - maintains cache (IP addr, MAC addr, TTL)
+        - <img src="images/link/arp.png" height="100"/>
+
+- Ethernet (protocol)
+    - frame with src, dst, payload,... of course
+    - Connectionless : no handshake
+    - Unreliable (but very good)
+    - uses CSMA/CD
+        - but with exponential backoff 
+            - after the $m^{th}$ collision, wait time at random up to $2^m-1$
+            
+- Switch (=commutateur)
+    - used in a star topology (> bus topology)
+    - maintains a switch table (MAC addr, Port, TTL)
+    - no routing protocol, self-learning ! 
+        - ```py
+            def receive_frame(frame, input_port):
+                # frame.src, frame.dst => MAC addr
+                # port => switch I/O
+
+                associate(frame.src, input_port) # only way to learn port/addr
+
+                if output_port found for frame.dst:
+                    if (input_port == output_port):
+                        delete(frame) # filtering since src == dst
+                    else:
+                        forward(frame, output_port)
+                else:
+                    flood(frame) # forward on all except input_port
+        ```
+    - Switch vs Router 
+        - Router 
+            - Network layer 
+            - Routing algo 
+            - Between subnets
+        - Switch 
+            - Link layer 
+            - self learning
+            - in subnets
 
 ### Physical <!-- markmap: fold -->
 
