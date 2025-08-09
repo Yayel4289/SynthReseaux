@@ -2,7 +2,7 @@
 title: Réseaux
 markmap:
     spacingVertical: 15
-    spacingHorizontal: 100
+    spacingHorizontal: 105
     colorFreezeLevel: 3
     color:
         - cyan
