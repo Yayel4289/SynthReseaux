@@ -18,22 +18,22 @@ markmap:
 
 ### Application
 
-- Exemples : vie de tous les jours
+- Examples
     - e-mail (voir tp 3)
     - web 
     - jeux 
     - streaming
-- Termes techniques 
+- Technical terms
     - URI $\Rightarrow$ Uniform Resource Identifier
     - URL $\Rightarrow$ Uniform Resource Locator 
         - Composed of URI's
-- Principes des applications réseaux
+- Network Applications Principles
     - Client-Server model
         - Server process : **wait** for communication
         - Client process : **initiates** communication 
     - Socket 
         - interface OS/network stack (Transport, Network, ...)
-        - choix de protocole de transport (TCP, UDP)
+        - choice of transport protocol (TCP, UDP)
         - Socket programming (tp)
     - Adressing remote process
         - IP adress + Port number
@@ -44,7 +44,7 @@ markmap:
     - Hyper Text Transfer Protocol (Secure) $\Rightarrow$ HTTP(S)
         - Uses URL to 
             - Address Objects
-            - Send parameters (ex : "search=lorem", ...)
+            - Send parameters (ex : `google.com?search=lorem&...`)
         - Stateless 
             - Server maintains no info about past clients
         - Client-Server model
@@ -76,7 +76,7 @@ markmap:
                 - Close connection (when data is transmitted)
                 - Transfer-encoding : chunked header $\Rightarrow$ message split in chunks with length + content
                 - Implicit length $\Rightarrow$ responses without content, usually error msgs
-        - Performances 
+        - Performance 
             - Def RTT : Round Trip Time $\Rightarrow$ temps pour aller-retour client-server
             - $T$ = time to transmit file
             - Non-persistent HTTP (HTTP/1.0 default behavior)
@@ -160,18 +160,16 @@ markmap:
             - IP address $\Rightarrow$ Hostname : Reverse Lookup
                 - IP addresses translated to string and searched (from end always)
                     
-        - DNS tool $\Rightarrow$ `dig` (tp)
-
 
 ### Transport
 
-- Termes techniques
+- Technical terms
     - Port number 
         - identifies process communication end point (HTTP, ...)
         - Used by Transport Protocols
 
     - Checksum
-        - let $n_i$ the components of a segment 
+        - let $n_i$ the components (16 bits long) of a segment 
         - the segment keeps $CS = \neg \sum n_i \Rightarrow CS + \sum n_i =$ only 1's
         - so can tell if corrupted bit
     
@@ -216,6 +214,17 @@ markmap:
 - Protocols 
     - Transmission Control Protocol $\Rightarrow$ TCP 
         - Segment structure
+            - Content 
+                - source port nbr 
+                - dest port nbr 
+                - sequence nbr 
+                - ACK nbr 
+                - flags (ACK, etc)
+                - checksum 
+                - options (SACK, MSS, etc)
+                - receive windown `rwnd` (flow control)
+                - ...
+
             - Maximum Segment Size $\Rightarrow$ MSS 
                 - restrained by MTU (Maximum Transmission Unit)
                     - <img src="images/transport/mss.png" height="70"/>
@@ -231,16 +240,7 @@ markmap:
                         - else : send when 
                             - previous pkt is ACK'd 
                             - segment size reached MSS
-            - Content 
-                - source port nbr 
-                - dest port nbr 
-                - sequence nbr 
-                - ACK nbr 
-                - flags (ACK, etc)
-                - checksum 
-                - options (SACK, MSS, etc)
-                - receive windown `rwnd` (flow control)
-                - ...
+
         - Reliable data transfer 
             - Retransmission TimeOut $\Rightarrow$ RTO 
                 - Depends of RTT $\Rightarrow$ need to constantly estimate RTT
@@ -282,7 +282,6 @@ markmap:
                     - OR
                     - Avoid sendind too small segments (sender part) $\Rightarrow$ Nagle's algo
             - $Throughput \approx \frac{rwnd}{RTT}$
-            - Options to scale `rwnd` to `rwnd`$\cdot 2^N$
         - Connection Managment 
             - 3-way handshake
                 - <img src="images/transport/three_way.png" height="100"/>
@@ -519,39 +518,33 @@ markmap:
                 - poisoned reverse 
                     - <img src="images/network/count_to_inf/pr.png" height="100"/>
 
-
-- Switching 
-    - Def : defines how a network element forwards data with its header
-    - Circuit Switching or Packet Switching
-
-    
 - Network Structure
     - ISP : Internet Service Provider (Fournisseur d'accès internet)
     - Tier 1,2,3/local $\Rightarrow$ chaque tier paye au-dessus (tier 3 = Proximus, local can be univ, etc)
 
 ### Link
-- Comment transférer data ?
-    - Circuit Switching : Réservation d'un circuit pour transférer
+- How to transfer data ?
+    - Circuit Switching : Reserved  circuit for transfer
         - Resources : link bandwidth + switch capacity (not ability)
-        - Ressources dédiée / 1 circuit $\Rightarrow$ perf++
+        - Dedicated resources for 1 circuit $\Rightarrow$ perf++
         - Multiplexing
             - Share 1 link among N circuits
                 - Frequency Division Multiplexing (FDM)
                     - <img src="images/intro/fdm.png" height="100"/>
-                    - Comment ? Signal porteur $f_c$
+                    - How ? Carrier Signal $f_c$
                 - Time Division Multiplexing (TDM)
                     - <img src="images/intro/tdm.png" height="100"/>
-                    - Comment ? RR-like algo
+                    - How ? RR-like algo
                 - $R_{new} = \frac{R}{N}$
-    - Packet Switching : division data en packets
+    - Packet Switching : breaking data into pkts
         - 1 lien / packet
-        - delay 
+        - delays
             - variables 
                 - $L$ packet length (bits b)
                 - $R$ link bandwidth (b/s)
                 - $d$ physical link length (m)
                 - $s$ propagation speed (m/s)
-            - formules et données
+            - formulas
                 - $d_{trans} = \frac{L}{R}$ (transmission delay)
                 - $d_{propa} = \frac{d}{s}$ (propagation delay)
                 - $d_{proc}$ (processing delay, often negligible)
@@ -705,21 +698,21 @@ markmap:
 
 ### Physical <!-- markmap: fold -->
 
-- Termes techniques
-    - Modem : modulateur - démodulateur de signaux (analogique $\Leftrightarrow$ digital)
-    - Baseband : Données à transmettre, fréquence notée $f_b$
-    - Carrier signal / Signal porteur : Signal servant à transporter des données, fréquence notée $f_c$
-    - Passband / Bande passante : Signal modulé à partir de Baseband et Carrier signal, avec $f_b$ <<< $f_c$
+- Technical terms
+    - Modem : signal modulator - demodulator (analogical $\Leftrightarrow$ digital)
+    - Baseband : data to transmit, frequency $f_b$
+    - Carrier signal : signal that carries data, frequency $f_c$
+    - Passband : modulated signal from Baseband and Carrier signal, avec $f_b$ <<< $f_c$
 
-- Modulations Digitales
-    - M : nombre de symboles (QPSK, QAM)
-    - N : nombre de bits encodés par symbole, $N = log_2(M)$
-    - Symbol / Baud rate : $R_s = \frac{1}{T_s}$
+- Digital modulations
+    - M : symbol number (QPSK, QAM)
+    - N : number of bits encoded per symbol, $N = log_2(M)$
+    - Symbol/Baud rate : $R_s = \frac{1}{T_s}$
     - Bit rate : $R = \frac{N}{T_s} = N R_s$
     - <img src="images/intro/digital_modulations.png" height="100"/>
     - <img src="images/intro/qpsk.png" height="100"/>
     - QAM <img src="images/intro/qam.png" height="100"/>
-    - plus efficace (avec noise) : PSK, QPSK
+    - best efficiency (with noise) : PSK, QPSK
 
 - Transmission impairments
     - Limited Bandwidth :
@@ -751,7 +744,7 @@ markmap:
 
 ## Protocols
 
-- Ensemble de règles permettant de communiquer (syntaxes, type de msg, ...)
+- Ruleset to commnunicate (syntax, message type, ...)
 - Encoding 
     - Should follow 
         - Space Efficiency 
